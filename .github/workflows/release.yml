@@ -1,0 +1,57 @@
+name: release
+
+# Tag a release and this builds it and publishes a GitHub Release automatically:
+#   git tag v1.2.0 && git push origin v1.2.0
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (e.g. v1.0.0)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build native tools
+        run: make all
+
+      - name: Verify binaries
+        run: |
+          set -e
+          for b in uidrive ocrtext appctl axctl; do
+            test -x "build/$b" || { echo "MISSING build/$b"; exit 1; }
+          done
+          test -f build/appshim.dylib
+
+      - name: Resolve tag
+        id: tag
+        run: echo "tag=${GITHUB_REF_NAME:-${{ github.event.inputs.tag }}}" >> "$GITHUB_OUTPUT"
+
+      - name: Package prebuilt macOS tools
+        run: |
+          mkdir -p dist
+          cp build/uidrive build/ocrtext build/appctl build/axctl build/appshim.dylib dist/
+          cp README.md cvfill/setup/HANDOVER.md dist/ 2>/dev/null || true
+          ( cd dist && zip -q "auto-apply-macos-${{ steps.tag.outputs.tag }}.zip" \
+              uidrive ocrtext appctl axctl appshim.dylib HANDOVER.md README.md )
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
+            && gh release upload "$TAG" "dist/auto-apply-macos-$TAG.zip" --clobber --repo "$GITHUB_REPOSITORY" \
+            || gh release create "$TAG" "dist/auto-apply-macos-$TAG.zip" \
+                 --repo "$GITHUB_REPOSITORY" \
+                 --title "Auto-Apply $TAG" \
+                 --generate-notes

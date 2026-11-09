@@ -26,7 +26,7 @@ echo "  (you can watch progress here; windows will"
 echo "   pop up when we need you)"
 echo "==============================================="
 
-info "Welcome! This sets up your personal job-application assistant.\n\nIt will:\n  • install the Codex assistant\n  • sign you in\n  • build the tool and create an \"Auto-Apply\" app you can click\n\nTakes a few minutes. Click OK to begin."
+info "Welcome! This sets up your personal job-application assistant.\n\nWHAT IT DOES\n  • Keeps your application info in one safe place (passwords in your Mac Keychain).\n  • Finds internships/jobs on real company career sites.\n  • Logs you in to each company once, then fills applications for you.\n  • NEVER submits — you always review and click Submit yourself.\n\nThis installer will install the assistant (Codex), sign you in, build the tool,\nand create an \"Auto-Apply\" app you can click.\n\nTakes a few minutes. Click OK to begin."
 
 # ---- 1. Xcode Command Line Tools (needed to build the tool) ----
 step "Checking developer tools..."
@@ -114,8 +114,16 @@ ln -sf "$APP_DIR" "$HOME/Desktop/Auto-Apply.app" 2>/dev/null || true
 
 echo "App created at $APP_DIR"
 
-# ---- 9. Done ----
-if confirm "All set! 🎉\n\nYour \"Auto-Apply\" app is in Applications (and on your Desktop).\nOpen it anytime to talk to your assistant — just type what you want.\n\nOpen it now to finish setting up your info and find your first jobs?"; then
+# ---- 9. Done — show the whole handover right here in the window ----
+info "All set! 🎉\n\nYour \"Auto-Apply\" app is now in Applications and on your Desktop.\n\nThe next few windows explain everything you need — there's nothing else to read."
+
+info "HOW TO USE IT (every time)\n\nDouble-click the Auto-Apply app. A window opens with your assistant.\nJust type what you want, in plain English. For example:\n\n  • add my resume\n  • find me software internships at NVIDIA and Apple\n  • log me in to my companies\n  • fill this application:  (then paste a job link)\n\nThe assistant runs everything for you and explains the results.\nIt fills forms but NEVER clicks Submit — you review and submit yourself."
+
+info "HOW TO CHANGE IT (no coding, ever)\n\nYou never edit anything yourself — you just ASK the assistant. For example:\n\n  • \"I only want jobs in Texas.\"\n  • \"Also fill my graduation date and GitHub.\"\n  • \"Add my company — here's the careers page link.\"\n  • \"The phone number didn't fill — can you fix it?\"\n\nIt changes the tool for you, tests it, and tells you it's done."
+
+info "YOUR INFO STAYS PRIVATE\n\n  • Your details and resume are saved ONLY on your Mac (a private file).\n  • Any passwords go into your macOS Keychain — never a plain file.\n  • Your info is sent only to the career site you're applying to — nowhere else.\n\nIf anything ever seems off, just open the app and describe it;\nthe assistant will look into it and fix it."
+
+if confirm "Ready to go!\n\nOpen Auto-Apply now to set up your info and find your first jobs?"; then
   open "$APP_DIR"
 fi
 echo; echo "Done. You can close this window."
