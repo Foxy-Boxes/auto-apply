@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ffprobe *)",
+      "Bash(log show *)",
+      "Bash(sw_vers*)",
+      "Bash(pmset -g *)",
+      "Bash(codesign -d *)",
+      "Bash(launchctl print *)",
+      "Bash(system_profiler *)",
+      "Bash(./build/uidrive *)",
+      "Bash(build/uidrive *)",
+      "Bash(./build/appctl *)",
+      "Bash(./build/axctl *)",
+      "Bash(scripts/ud.sh *)",
+      "Bash(./scripts/ud.sh *)"
+    ]
+  }
+}

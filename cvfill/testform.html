@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Information — Application</title>
+<style>
+  body { font: 15px -apple-system, system-ui, sans-serif; max-width: 640px; margin: 24px auto; padding: 0 16px; color:#111; }
+  h1 { font-size: 20px; }
+  .row { margin: 14px 0; }
+  label { display:block; font-weight:600; margin-bottom:4px; }
+  input, select { width:100%; padding:8px 10px; font-size:15px; border:1px solid #bbb; border-radius:6px; box-sizing:border-box; }
+  button { margin-top:18px; padding:10px 18px; font-size:15px; }
+</style>
+</head>
+<body>
+<h1>My Information</h1>
+<form id="app">
+  <div class="row"><label for="fn">First Name</label>
+    <input id="fn" name="firstName" placeholder="First Name" aria-label="First Name" autocomplete="given-name"></div>
+  <div class="row"><label for="ln">Last Name</label>
+    <input id="ln" name="lastName" placeholder="Last Name" aria-label="Last Name" autocomplete="family-name"></div>
+  <div class="row"><label for="em">Email Address</label>
+    <input id="em" type="email" name="email" placeholder="Email Address" aria-label="Email Address" autocomplete="email"></div>
+  <div class="row"><label for="ph">Phone Number</label>
+    <input id="ph" type="tel" name="phone" placeholder="Phone Number" aria-label="Phone Number" autocomplete="tel"></div>
+  <div class="row"><label for="a1">Address Line 1</label>
+    <input id="a1" name="address1" placeholder="Address Line 1" aria-label="Address Line 1" autocomplete="address-line1"></div>
+  <div class="row"><label for="ct">City</label>
+    <input id="ct" name="city" placeholder="City" aria-label="City" autocomplete="address-level2"></div>
+  <div class="row"><label for="st">State</label>
+    <input id="st" name="state" placeholder="State" aria-label="State" autocomplete="address-level1"></div>
+  <div class="row"><label for="zp">Postal Code</label>
+    <input id="zp" name="postalCode" placeholder="Postal Code" aria-label="Postal Code" autocomplete="postal-code"></div>
+  <div class="row"><label for="li">LinkedIn</label>
+    <input id="li" name="linkedin" placeholder="LinkedIn" aria-label="LinkedIn"></div>
+  <button type="button" id="submit">Submit</button>
+</form>
+<script>
+  // echo current values so we can read them back after filling
+  document.getElementById('submit').addEventListener('click', () => {
+    const d = {}; new FormData(document.getElementById('app')).forEach((v,k)=>d[k]=v);
+    document.title = 'SUBMITTED ' + JSON.stringify(d);
+  });
+</script>
+</body>
+</html>

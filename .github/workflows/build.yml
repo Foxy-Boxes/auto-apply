@@ -1,0 +1,63 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          sw_vers
+          xcrun clang --version
+          python3 --version
+
+      - name: Build native tools
+        run: make all
+
+      - name: Verify binaries were produced
+        run: |
+          set -e
+          for b in uidrive ocrtext appctl axctl cvform testapp; do
+            test -x "build/$b" && echo "ok: build/$b" || { echo "MISSING: build/$b"; exit 1; }
+          done
+          test -f build/appshim.dylib && echo "ok: build/appshim.dylib"
+
+      - name: Python syntax check (cvfill)
+        run: |
+          python3 -m py_compile cvfill/*.py
+          echo "python ok"
+
+      - name: Shell script check (installer/launcher)
+        run: |
+          for s in cvfill/setup/*.command; do
+            bash -n "$s" && echo "ok: $s"
+          done
+
+      - name: Smoke-test the tools (offline, no network, no UI)
+        run: |
+          # OCR tool should run and report usage without a crash.
+          ./build/ocrtext 2>&1 | head -1 || true
+          # uidrive should print its help/usage.
+          ./build/uidrive 2>&1 | head -1 || true
+          # jobsearch imports cleanly (adapters not hit — that needs network).
+          python3 -c "import sys; sys.path.insert(0,'cvfill'); import portals, jobsearch, vault, webfill, webauth, fill; print('cvfill imports ok')"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: auto-apply-macos-tools
+          path: |
+            build/uidrive
+            build/ocrtext
+            build/appctl
+            build/axctl
+            build/appshim.dylib
+          if-no-files-found: error
