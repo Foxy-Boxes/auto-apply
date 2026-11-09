@@ -12,10 +12,14 @@ It's built to be **owned by a non-programmer**. They install it once, then chang
 Microsoft", "add my work authorization". No scripting required.
 
 ### Get started
-- **To use/own it:** read [`cvfill/setup/HANDOVER.md`](cvfill/setup/HANDOVER.md), then
-  double-click `cvfill/setup/install.command`. It installs & signs in Codex, builds the
-  tools, creates your info vault, and makes a clickable **Auto-Apply** app that opens a
-  primed assistant session.
+- **Easiest — download the installer:** grab the latest **`Auto-Apply-vX.Y.Z.dmg`** from
+  [Releases](https://github.com/Foxy-Boxes/auto-apply/releases/latest), open it, and
+  double-click **Install Auto-Apply**. It copies the tool to your Applications, installs &
+  signs in Codex, builds everything, creates your info vault, and makes a clickable
+  **Auto-Apply** app that opens a primed assistant session. The installer windows explain
+  everything as they go.
+  *(First open: if macOS says "unidentified developer", right-click the icon → Open → Open.)*
+- **From source:** clone this repo and double-click `cvfill/setup/install.command`.
 - **How the assistant is primed:** [`cvfill/AGENTS.md`](cvfill/AGENTS.md) (its guide) +
   `cvfill/setup/onboarding_prompt.md` (first-run setup).
 

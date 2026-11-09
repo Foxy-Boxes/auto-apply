@@ -36,22 +36,36 @@ jobs:
         id: tag
         run: echo "tag=${GITHUB_REF_NAME:-${{ github.event.inputs.tag }}}" >> "$GITHUB_OUTPUT"
 
-      - name: Package prebuilt macOS tools
+      - name: Build DMG installer (source + one-click installer)
         run: |
+          TAG="${{ steps.tag.outputs.tag }}"
+          STAGE="dmgstage"
+          rm -rf "$STAGE"; mkdir -p "$STAGE/Auto-Apply"
+          # only committed files go in — no .git, no build/, no local data
+          git archive --format=tar HEAD | tar -x -C "$STAGE/Auto-Apply"
+          cp cvfill/setup/dmg-install.command "$STAGE/Install Auto-Apply.command"
+          chmod +x "$STAGE/Install Auto-Apply.command" "$STAGE/Auto-Apply/cvfill/setup/"*.command
+          mkdir -p dist
+          hdiutil create -volname "Auto-Apply" -srcfolder "$STAGE" -ov -format UDZO \
+            "dist/Auto-Apply-$TAG.dmg"
+
+      - name: Package prebuilt macOS tools (for developers)
+        run: |
+          TAG="${{ steps.tag.outputs.tag }}"
           mkdir -p dist
           cp build/uidrive build/ocrtext build/appctl build/axctl build/appshim.dylib dist/
           cp README.md cvfill/setup/HANDOVER.md dist/ 2>/dev/null || true
-          ( cd dist && zip -q "auto-apply-macos-${{ steps.tag.outputs.tag }}.zip" \
+          ( cd dist && zip -q "auto-apply-macos-tools-$TAG.zip" \
               uidrive ocrtext appctl axctl appshim.dylib HANDOVER.md README.md )
+          rm -f dist/uidrive dist/ocrtext dist/appctl dist/axctl dist/appshim.dylib \
+                dist/README.md dist/HANDOVER.md
 
-      - name: Create GitHub Release
+      - name: Create / update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${{ steps.tag.outputs.tag }}"
           gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
-            && gh release upload "$TAG" "dist/auto-apply-macos-$TAG.zip" --clobber --repo "$GITHUB_REPOSITORY" \
-            || gh release create "$TAG" "dist/auto-apply-macos-$TAG.zip" \
-                 --repo "$GITHUB_REPOSITORY" \
-                 --title "Auto-Apply $TAG" \
-                 --generate-notes
+            || gh release create "$TAG" --repo "$GITHUB_REPOSITORY" \
+                 --title "Auto-Apply $TAG" --generate-notes
+          gh release upload "$TAG" dist/*.dmg dist/*.zip --clobber --repo "$GITHUB_REPOSITORY"
